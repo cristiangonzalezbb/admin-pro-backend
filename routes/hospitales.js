@@ -10,22 +10,27 @@ const {getHospitales, creaHospitales, actualizarHospitales, borrarHospitales} = 
 
 const router = Router();
 
-// La primera es la ruta de getUsuarios.
+// La primera es la ruta de getHospitales.
 // La segunda es el controlador, no lo ejecuta solo envia la referencia, porque no tiene el ()
 router.get( '/', getHospitales );
 
-//Para crear un nuevo usuarios
+//Para crear un nuevo Hospital
 router.post( '/', 
     [ validarJWT,
     check('nombre', 'El nombre del hospital es necesario').not().isEmpty(),
-    validarCampos],
+    validarCampos
+    ],
     creaHospitales );
 
-//Para actualizar un usuario
+//Para actualizar un Hospital
 router.put( '/:id', 
-    [],
+    [validarJWT,
+    check('nombre', 'El nombre del hospital es necesario').not().isEmpty(),
+    validarCampos
+    ],
     actualizarHospitales );
 
+//Para Borrar Hospital
 router.delete( '/:id',
     borrarHospitales );
 
