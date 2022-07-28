@@ -4,7 +4,7 @@ const MedicoSchema = Schema({
 
     nombre: {
         type: String,
-        required: true,
+        required: true
     },
     img: {
         type: String,

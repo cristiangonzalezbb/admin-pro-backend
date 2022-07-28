@@ -1,6 +1,6 @@
 
 /* 
-    Logica que se ejecutara para la ruta que lo ejecuta
+    Logica que se ejecutara para la ruta que necesita realizar las funciones
     llamado Origen: /index
     Ruta:           /api/login
     Controlador:    /routes/login
@@ -9,10 +9,15 @@
 const { response } = require('express');
 const bcrypt = require('bcryptjs');
 const Usuario = require('../models/usuario');
-const { generarJWT } = require('../helper/jwt');
-const { googleVerify } = require('../helper/google-verify');
+//Se coecta al helper que genera los token
+const { generarJWT } = require('../helpers/jwt');
+//Viene del helpers que cuenta con las funciones entregadas por google
+const { googleVerify } = require('../helpers/google-verify');
 
-const login = async (req, res = response) => {
+const { getMenuFrontEnd } =  require('../helpers/menu-frontend');
+
+
+const login = async( req, res = response ) => {
 
     const { email, password } = req.body;
     // const usuario = await Usuario.find({}, 'nombre email role google ');
@@ -20,20 +25,21 @@ const login = async (req, res = response) => {
     
     try {
         // Verificar email
-        const usuarioDB = await Usuario.findOne( {email} );
-        if ( !usuarioDB) {
+        const usuarioDB = await Usuario.findOne({ email });
+
+        if ( !usuarioDB ) {
             return res.status(404).json({
                 ok: false,
-                msg: 'Mail no valida'
+                msg: 'Email no encontrado'
             });
         }
 
         // Verificar contraseña
         const validPassword = bcrypt.compareSync( password, usuarioDB.password );
-        if ( !validPassword) {
+        if ( !validPassword ) {
             return res.status(400).json({
                 ok: false,
-                msg: 'Contraseña no valida'
+                msg: 'Contraseña no válida'
             });
         }
 
@@ -42,7 +48,8 @@ const login = async (req, res = response) => {
         // console.log('vuelta', token);
         res.json({
             ok: true,
-            token
+            token,
+            menu: getMenuFrontEnd(usuarioDB.role)
         });
 
     } catch (error) {
@@ -56,7 +63,7 @@ const login = async (req, res = response) => {
 } 
 
 
-const googleSignIn = async (req =  require,  res = response) => {
+const googleSignIn = async (req,  res = response) => {
 
     const googleToken =  req.body.token;
     
@@ -64,7 +71,7 @@ const googleSignIn = async (req =  require,  res = response) => {
         
         const {name, email, picture} = await googleVerify( googleToken );
 
-        const usuarioDB = await Usuario.findOne( {email} );
+        const usuarioDB = await Usuario.findOne({ email });
         let usuario;
         if ( !usuarioDB) {
             //Si no existe
@@ -78,7 +85,7 @@ const googleSignIn = async (req =  require,  res = response) => {
         }else {
             // Existe usuario
             usuario = usuarioDB;
-            usuario.google= true;
+            usuario.google = true;
         }
         //Grabo en la base de datos
        await usuario.save();
@@ -88,33 +95,41 @@ const googleSignIn = async (req =  require,  res = response) => {
 
         res.json({
             ok:true,
-            token
+            token,
+            menu: getMenuFrontEnd(usuario.role)
         });    
     } catch (error) {
         res.status(401).json({
-            ok:false,
-            msg: 'Token no es correcto'
+            ok: false,
+            msg: 'Token no es correcto',
         });
     }
     
     }
 
-const renewToken = async (req =  require,  res = response) => {
-    
+
+const renewToken = async(req, res = response) => {
+
     const uid = req.uid;
-    
-    //Obtener el usuario por UID
+
+    // Generar el TOKEN - JWT
+    const token = await generarJWT( uid );
+
+    // Obtener el usuario por UID
     const usuario = await Usuario.findById( uid );
 
-    //Generar el TOKEN - JWT
-    const token = await generarJWT( uid );
     res.json({
-        ok:true,
+        ok: true,
         token,
-        usuario
-    }); 
+        usuario,
+        menu: getMenuFrontEnd(usuario.role)
+    });
 
 }
+
+
+
+
 module.exports = {
     login,
     googleSignIn,

@@ -1,36 +1,55 @@
 /*
-    Ruta: /api/hospitales
+    Medicos
+    ruta: '/api/medico'
 */
-const { Router } = require( 'express' );
+const { Router } = require('express');
 const { check } = require('express-validator');
-const { validarCampos } = require('../middlewares/validar-campos')
-const { validarJWT } = require('../middlewares/validar-jwt')
+const { validarCampos } = require('../middlewares/validar-campos');
 
-const { getMedicos, creaMedico, actualizarMedico, borrarMedico} = require('../controllers/medicos');
+const { validarJWT } = require('../middlewares/validar-jwt');
+
+const {
+    getMedicos,
+    crearMedico,
+    actualizarMedico,
+    borrarMedico,
+    getMedicoById
+} = require('../controllers/medicos')
 
 const router = Router();
 
-// La primera es la ruta de getUsuarios.
+// La primera es la ruta de getMedicos.
 // La segunda es el controlador, no lo ejecuta solo envia la referencia, porque no tiene el ()
 router.get( '/', getMedicos );
 
-//Para crear un nuevo usuarios
+//Para crear un nuevo Medico
 router.post( '/', 
     [ validarJWT,
       check('nombre', 'El nombre del medico es necesario').not().isEmpty(),
       check('hospital', 'El hospital id debe de ser válido').isMongoId(),
       validarCampos ],
-    creaMedico );
+    crearMedico );
 
-//Para actualizar un usuario
-router.put( '/:id', 
-    [validarJWT,
-    check('nombre', 'El nombre del medico es necesario').not().isEmpty(),
-    check('hospital', 'El hospital id debe de ser válido').isMongoId(),
-    validarCampos ],
-    actualizarMedico );
+router.put( '/:id',
+    [
+        validarJWT,
+        check('nombre','El nombre del médico es necesario').not().isEmpty(),
+        check('hospital','El hospital id debe de ser válido').isMongoId(),
+        validarCampos
+    ],
+    actualizarMedico
+);
 
 router.delete( '/:id',
-    borrarMedico );
+    validarJWT,
+    borrarMedico
+);
+
+router.get( '/:id',
+    validarJWT,
+    getMedicoById
+);
+
+
 
 module.exports = router;

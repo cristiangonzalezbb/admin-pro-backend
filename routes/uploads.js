@@ -1,11 +1,12 @@
 /*
-    Ruta: /api/upload
+    Ruta: /api/uploads
 */
 const { Router } = require( 'express' );
 const expressFileUpload = require('express-fileupload');
 
-const { validarJWT } = require('../middlewares/validar-jwt')
-const { fileUpload, retornaImagen } = require("../controllers/uploads")
+
+const { validarJWT } = require('../middlewares/validar-jwt');
+const { fileUpload, retornaImagen } = require('../controllers/uploads');
 
 const router = Router();
 
@@ -16,4 +17,5 @@ router.use( expressFileUpload());
 // La segunda es el controlador, no lo ejecuta solo envia la referencia, porque no tiene el ()
 router.put( '/:tipo/:id', validarJWT, fileUpload );
 router.get( '/:tipo/:foto', retornaImagen );
+
 module.exports = router;

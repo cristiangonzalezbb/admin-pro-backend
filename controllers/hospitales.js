@@ -1,5 +1,5 @@
 /* 
-    Logica que se ejecutara para la ruta que lo ejecuta
+    Logica que se ejecutara para la ruta que necesita realizar las funciones
     llamado Origen: /index
     Ruta:           /api/hospitales
     Controlador:    /routes/hospitales
@@ -7,18 +7,20 @@
 const { request ,response } = require('express');
 const Hospital = require('../models/hospital');
 
-const getHospitales = async (req = request, res) => {
+const getHospitales = async (req = request, res = response) => {
 
+    //populate(), que le permite hacer referencia a documentos en otras colecciones
     const hospitales = await Hospital.find()
-                            .populate('usuario', 'nombre img')
+                                    .populate('usuario','nombre img');
+
     res.json({
         ok: true,
         hospitales
-    });
-} 
+    })
+}
 
-const creaHospitales = async (req, res = response) => {
-   
+const crearHospital = async(req, res = response) => {
+
     const uid = req.uid;
 
     const hospital = new Hospital({
@@ -29,10 +31,10 @@ const creaHospitales = async (req, res = response) => {
 
     try {
 
-        const hospitalBD = await hospital.save();
+        const hospitalDB = await hospital.save();
         res.json({
             ok: true,
-            hospital: hospitalBD
+            hospital: hospitalDB
         });
 
     } catch (error) {
@@ -44,8 +46,10 @@ const creaHospitales = async (req, res = response) => {
     }
 } 
 
-const actualizarHospitales = async (req = request, res = response) => {
+const actualizarHospital = async (req = request, res = response) => {
+    //id del Hospital
     const id  = req.params.id;
+    //uid del usuario
     const uid = req.uid;
     console.log(uid);
 
@@ -60,7 +64,10 @@ const actualizarHospitales = async (req = request, res = response) => {
         }
 
         const cambiosHospital = {
+            //Recupero todo lo que tengo en el body
             ...req.body,
+            //Además, paso el uid que viene del const uid = req.uid;
+            //que fue generado en validarJWT
             usuario: uid
         }
 
@@ -81,14 +88,14 @@ const actualizarHospitales = async (req = request, res = response) => {
 }
 
 
-const borrarHospitales = async (req, res = response) => {
+const borrarHospital = async (req, res = response) => {
     
     const id = req.params.id;
         
     try {
 
-        const hospitalDB = await Hospital.findById( id );
-        if ( !hospitalDB){
+        const hospital = await Hospital.findById( id );
+        if ( !hospital){
             return res.status(404).json({
                 ok: false,
                 msg: 'No existe un hospital por ese id'
@@ -99,21 +106,25 @@ const borrarHospitales = async (req, res = response) => {
 
         res.json({
             ok: true,
-            msg: 'Hospital Eliminado'
+            msg: 'Hospital eliminado'
         });
 
     } catch (error) {
+
         console.log(error);
+
         res.status(500).json({
             ok: false,
             msg: 'Hable con el administrador'
-        });
+        })
     }
 }
 
 
-module.exports = { 
+
+module.exports = {
     getHospitales,
-    creaHospitales,
-    actualizarHospitales,
-    borrarHospitales };
+    crearHospital,
+    actualizarHospital,
+    borrarHospital
+}

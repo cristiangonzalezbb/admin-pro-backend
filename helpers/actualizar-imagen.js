@@ -13,51 +13,63 @@ const borrarImagen = (path) =>{
         fs.unlinkSync( path );
     }
 }
-const actualizarImagen = async (tipo, id, nombreArchivo) => {
+
+
+const actualizarImagen = async(tipo, id, nombreArchivo) => {
+
     let pathViejo = '';
     // console.log('Vamos Bien');
     switch ( tipo ) {
         case 'medicos':
-            const medico = await Medico.findById( id );
+            const medico = await Medico.findById(id);
             if ( !medico ) {
-                console.log('No es médico por id');
+                console.log('No es un médico por id');
                 return false;
             }
+
             pathViejo = `./uploads/medicos/${ medico.img }`;
-            borrarImagen(pathViejo);
+            borrarImagen( pathViejo );
 
             medico.img = nombreArchivo;
-            medico.save();
+            await medico.save();
             return true;
         break;
 
         case 'hospitales':
-            const hospital = await Hospital.findById( id );
+            const hospital = await Hospital.findById(id);
             if ( !hospital ) {
-                console.log('No es Hospital por id');
+                console.log('No es un hospital por id');
                 return false;
             }
+
             pathViejo = `./uploads/hospitales/${ hospital.img }`;
-            borrarImagen(pathViejo);
+            borrarImagen( pathViejo );
 
             hospital.img = nombreArchivo;
-            hospital.save();
-            return true;            
+            await hospital.save();
+            return true;
+
         break;
+        
         case 'usuarios':
-            const usuario = await Usuario.findById( id );
+
+            const usuario = await Usuario.findById(id);
             if ( !usuario ) {
-                console.log('No es Usuario por id');
+                console.log('No es un usuario por id');
                 return false;
             }
-            pathViejo = `./uploads/usuarios/${ usuario.img }`;
-            borrarImagen(pathViejo);
+
+            pathViejo = `./uploads/hospitales/${ usuario.img }`;
+            borrarImagen( pathViejo );
 
             usuario.img = nombreArchivo;
-            usuario.save();
-            return true;              
+            await usuario.save();
+            return true;
+
         break;
     }
+
+
 }
 
 

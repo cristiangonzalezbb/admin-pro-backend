@@ -1,7 +1,10 @@
-const {OAuth2Client} = require('google-auth-library');
-const client = new OAuth2Client(process.env.GOOGLE_ID);
+//Esto se carga con la instalación de la libreria de google llamada google-auth-library
+const { OAuth2Client } = require('google-auth-library');
+//Es el id que nos entrego google que tenemos guardado en .env
+const client = new OAuth2Client( process.env.GOOGLE_ID );
 
-const googleVerify = async (token) => {
+//Este codigo esta en la documentacion
+const googleVerify = async( token ) => {
 
   const ticket = await client.verifyIdToken({
       idToken: token,

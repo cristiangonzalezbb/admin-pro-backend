@@ -1,6 +1,6 @@
 
 /* 
-    Logica que se ejecutara para la ruta que lo ejecuta
+    Logica que se ejecutara para la ruta que necesita realizar las funciones
     llamado Origen: /index
     Ruta:            /api/todo/:busqueda
     Controlador:    /routes/busquedas
@@ -17,7 +17,7 @@ const Hospital = require('../models/hospital');
 const getTodo = async (req = request, res = response) => {
 
     const busqueda = req.params.busqueda;
-    const regex =  new RegExp( busqueda, 'i');
+    const regex = new RegExp( busqueda, 'i' );
 
     //De esta forma se hace la consulta 1:1
     // const usuarios      = await Usuario.find({nombre: regex});
@@ -62,30 +62,34 @@ const getDocumentosColeccion = async (req = request, res = response) => {
 
     switch ( tabla ){
         case 'medicos':
-            data = await Medico.find({nombre: regex})
-                               .populate('usuario', 'nombre img')
-                               .populate('hospital', 'nombre img');
+            //populate(), que le permite hacer referencia a documentos en otras colecciones
+            data = await Medico.find({ nombre: regex })
+                                .populate('usuario', 'nombre img')
+                                .populate('hospital', 'nombre img');
         break;
+
         case 'hospitales':
-            data = await Hospital.find({nombre: regex})
-                                 .populate('usuario', 'nombre img');
+            //populate(), que le permite hacer referencia a documentos en otras colecciones
+            data = await Hospital.find({ nombre: regex })
+                                    .populate('usuario', 'nombre img');
         break;
+
         case 'usuarios':
-            data = await Usuario.find({nombre: regex})
-                                .populate('usuario', 'nombre img');
+            data = await Usuario.find({ nombre: regex });
+            
         break;
 
         default:
             return res.status(400).json({
-                ok:false,
+                ok: false,
                 msg: 'La tabla tiene que ser usuarios/medicos/hospitales'
             });
     }
-
-    return res.status(200).json({
-        ok:true,
+    
+    res.json({
+        ok: true,
         resultados: data
-    });
+    })
 
 } 
 
